@@ -1,0 +1,170 @@
+import random
+import matplotlib.pyplot as plt
+import numpy as np
+import time as tm
+
+class BSTNode():
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.left_child = None
+        self.right_child = None
+    def setLeftChild(self, otherNode):
+        self.left_child = otherNode
+    def setRightChild(self, otherNode):
+        self.right_child = otherNode
+    def hasLeftChild(self):
+        if self.left_child is not None:
+            return True
+        return False
+    def hasRightChild(self):
+        if self.right_child is not None:
+            return True
+        return False
+    
+class BSTree():
+    def __init__(self):
+        self.root_node = None
+    def sizeHelper(self, node, total):
+        if node.hasLeftChild():
+            total=self.sizeHelper(node.left_child, total)+1
+        if node.hasRightChild():
+            total=self.sizeHelper(node.right_child, total)+1
+        return total
+    def size(self, root):
+        if root is None:
+            return 0
+        else:
+            return self.sizeHelper(self.root_node, 1)
+    def hasKeyRecursive(self, query, root):
+        if root is None:
+            return False
+        elif root.key>query:
+            return self.hasKeyRecursive(query, root.left_child)
+        elif root.key<query:
+            return self.hasKeyRecursive(query, root.right_child)
+        else:
+            return True
+    def hasKey(self, query):
+        return self.hasKeyRecursive(query, self.root_node)
+    def searchingRecursive(self, query, root, directions):
+        if root is None:
+            return []
+        elif root.key<query:
+            directions.append(0)
+            return self.searchingRecursive(query, root.right_child, directions)
+        elif root.key>query:
+            directions.append(1)
+            return self.searchingRecursive(query, root.left_child, directions)
+        else:
+            return directions
+    def putRecursive(self, root, query, value):
+        if root.key<query:
+            if root.right_child is None:
+                new_node = BSTNode(query, value)
+                root.right_child=new_node
+            else:
+                self.putRecursive(root.right_child, query, value)
+        elif root.key>query:
+            if root.left_child is None:
+                new_node = BSTNode(query, value)
+                root.left_child=new_node
+            else:
+                self.putRecursive(root.left_child, query, value)
+    def put(self, query, value):
+        if self.root_node is None:
+            new_node = BSTNode(query, value)
+            self.root_node=new_node
+        elif self.hasKey(query):
+            current_node = self.root_node
+            directions = self.searchingRecursive(query, self.root_node, [])
+            index = 0
+            while index<len(directions):
+                if directions[index]==0:
+                    current_node = current_node.right_child
+                elif directions[index]==1:
+                    current_node = current_node.left_child
+                index+=1
+            current_node.value=value
+        else:
+            self.putRecursive(self.root_node, query, value)
+    def get(self, key):
+        if self.hasKey(key):
+            current_node = self.root_node
+            directions = self.searchingRecursive(key, current_node, [])
+            index = 0
+            while index<len(directions):
+                if directions[index] == 0:
+                    current_node=current_node.right_child
+                elif directions[index]==1:
+                    current_node=current_node.left_child
+                index+=1
+            return current_node.value
+        return None
+    def searchParent(self, node, key):
+        if node.hasLeftChild():
+            if node.left_child.key == key:
+                return node
+            self.searchParent(node.left_child, key)
+        if node.hasRightChild():
+            if node.right_child.key == key:
+                return node
+            self.searchParent(node.right_child, key)
+        return None
+    def getNodeFromKey(self, key):
+        current_node = self.root_node
+        directions = self.searchingRecursive(key, current_node, [])
+        index = 0
+        while index<len(directions):
+            if directions[index] == 0:
+                current_node=current_node.right_child
+            elif directions[index]==1:
+                current_node=current_node.left_child
+            index+=1
+        return current_node
+    def remove(self, key):
+        if self.hasKey(key):
+            parent = self.searchParent(self.root_node, key)
+            node = self.getNodeFromKey(key)
+            if parent is not None:
+                if node.hasLeftChild():
+                    if parent.left_child == node:
+                        parent.left_child = node.left_child
+                    else:
+                        parent.right_child = node.left_child
+                elif node.hasRightChild():
+                    if parent.left_child == node:
+                        parent.left_child = node.right_child
+                    else:
+                        parent.right_child = node.right_child
+                if node.hasLeftChild() and node.hasRightChild():
+                    node.left_child.right_child = node.right_child
+            node = None
+        return
+        if self.hasKey(key):
+            current_node = self.root_node
+            former_node = self.root_node
+            directions = self.searchingRecursive(key, current_node, [])
+            index = 0
+            while index<len(directions):
+                if directions[index] == 0:
+                    former_node=current_node
+                    current_node=current_node.right_child
+                elif directions[index]==1:
+                    former_node=current_node
+                    current_node=current_node.left_child
+                index+=1
+            if len(directions)>0:
+                if directions[len(directions)-1]==0:
+                    former_node.right_child = None
+                else:
+                    former_node.left_child = None
+            current_node = None
+        return None
+            
+
+t = BSTree()
+t.put(1, "a")
+t.put(2, "b")
+t.put(3, "c")
+t.put(2, "d")
