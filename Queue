@@ -1,0 +1,53 @@
+class Node():
+    def __init__(self, data=None):
+        self.data = data
+        self.next = None
+        self.prev = None
+class Queue():
+    def __init__(self):
+        self.head = None
+
+    def enqueue(self, data_in):
+        new_node = Node(data_in)
+        new_node.next = self.head
+        if self.head is not None:
+            self.head.prev = new_node
+        self.head = new_node
+        
+    def dequeue(self):
+        if self.head is None:
+            return 
+        if self.head.next is None:
+            returner = self.head.data
+            self.head = None
+            return returner
+        returner = self.head.next
+        while returner.next is not None:
+            returner = returner.next
+        returner.prev.next = None
+        return returner.data
+            
+    def peek(self):
+        returnVal = self.head
+        counter = returnVal.next
+        while (counter):
+            returnVal=counter
+            counter=counter.next
+        return returnVal.data
+    
+    def isEmpty(self):
+        if(self.head is not None):
+            return False
+        return True
+            
+
+queue = Queue()
+queue.enqueue(1)
+queue.enqueue(2)
+queue.enqueue(3)
+
+print(queue.dequeue() == 1)
+print(queue.dequeue() == 2)
+print(queue.dequeue() == 3)
+    
+print(queue.isEmpty())
